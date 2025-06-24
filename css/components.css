@@ -1,4 +1,4 @@
-/* Components CSS - Non-critical styles */
+/* Components CSS - Non-critical styles with Pink/Purple Theme */
 
 /* Section Styles */
 .section-header {
@@ -47,8 +47,8 @@
 
 .filter-btn.active,
 .filter-btn:hover {
-  border-color: #d4af37;
-  background: linear-gradient(to right, #d4af37, #1e3a8a);
+  border-color: #ec4899;
+  background: linear-gradient(to right, #ec4899, #a855f7);
   color: white;
 }
 
@@ -131,7 +131,7 @@
 .event-price {
   font-size: 1.125rem;
   font-weight: bold;
-  background: linear-gradient(to right, #d4af37, #1e3a8a);
+  background: linear-gradient(to right, #ec4899, #a855f7);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -140,7 +140,7 @@
 /* Packages Section */
 .packages {
   padding: 3rem 0 6rem;
-  background: linear-gradient(to right, #fef3c7, #dbeafe);
+  background: linear-gradient(to right, #fdf2f8, #faf5ff);
 }
 
 .packages-grid {
@@ -167,7 +167,7 @@
 }
 
 .package-card.featured {
-  border-color: #d4af37;
+  border-color: #ec4899;
   transform: scale(1.05);
 }
 
@@ -176,7 +176,7 @@
   top: -12px;
   left: 50%;
   transform: translateX(-50%);
-  background: linear-gradient(to right, #d4af37, #1e3a8a);
+  background: linear-gradient(to right, #ec4899, #a855f7);
   color: white;
   padding: 0.5rem 1rem;
   border-radius: 0.5rem;
@@ -203,7 +203,7 @@
 .price {
   font-size: 2.5rem;
   font-weight: bold;
-  background: linear-gradient(to right, #d4af37, #1e3a8a);
+  background: linear-gradient(to right, #ec4899, #a855f7);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -320,7 +320,7 @@
 
 /* Contact Section */
 .contact {
-  background: linear-gradient(to right, #fef3c7, #dbeafe);
+  background: linear-gradient(to right, #fdf2f8, #faf5ff);
   padding: 3rem 0 6rem;
 }
 
@@ -359,7 +359,7 @@
 .contact-icon {
   width: 24px;
   height: 24px;
-  color: #d4af37;
+  color: #ec4899;
   flex-shrink: 0;
 }
 
@@ -414,8 +414,8 @@
 .form-group select:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: #d4af37;
-  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+  border-color: #ec4899;
+  box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.1);
 }
 
 .form-group textarea {
@@ -452,7 +452,7 @@
 
 /* Footer */
 .footer {
-  background: linear-gradient(to right, #fef3c7, #dbeafe);
+  background: linear-gradient(to right, #fdf2f8, #faf5ff);
   padding: 3rem 0 1rem;
 }
 
@@ -486,7 +486,7 @@
   justify-content: center;
   width: 40px;
   height: 40px;
-  background: linear-gradient(to right, #d4af37, #1e3a8a);
+  background: linear-gradient(to right, #ec4899, #a855f7);
   color: white;
   border-radius: 50%;
   text-decoration: none;
@@ -517,7 +517,7 @@
 }
 
 .footer-link:hover {
-  color: #d4af37;
+  color: #ec4899;
 }
 
 .footer-contact {
@@ -552,7 +552,7 @@
 }
 
 .notification.success {
-  background: linear-gradient(to right, #d4af37, #1e3a8a);
+  background: linear-gradient(to right, #ec4899, #a855f7);
   color: white;
 }
 
@@ -573,4 +573,46 @@
 
 .notification.show {
   transform: translateX(0);
+}
+
+.notification-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.notification-close {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+  transition: background-color 0.2s ease;
+}
+
+.notification-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.notification-close svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Animation Classes */
+.animate-in {
+  animation: fadeInUp 0.6s ease forwards;
+}
+
+/* Loading States */
+.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.loaded {
+  opacity: 1;
+  transition: opacity 0.3s ease;
 }
