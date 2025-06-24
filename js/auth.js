@@ -25,7 +25,12 @@ const Auth = {
       this.loadUserFromStorage()
     }
 
-    this.setupEventListeners()
+    // Setup event listeners after DOM is ready
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", () => this.setupEventListeners())
+    } else {
+      this.setupEventListeners()
+    }
   },
 
   // Handle auth state changes
@@ -40,15 +45,15 @@ const Auth = {
       }
 
       this.saveUserToStorage()
-      UI.updateAuthUI(this.currentUser)
+      window.UI.updateAuthUI(this.currentUser)
 
       if (!this.currentUser.email_verified) {
-        UI.showNotification("Por favor verifica tu email para acceder a todas las funciones", "warning")
+        window.UI.showNotification("Por favor verifica tu email para acceder a todas las funciones", "warning")
       }
     } else if (event === "SIGNED_OUT") {
       this.currentUser = null
       this.removeUserFromStorage()
-      UI.updateAuthUI(null)
+      window.UI.updateAuthUI(null)
     }
   },
 
@@ -69,7 +74,7 @@ const Auth = {
 
         if (error) throw error
 
-        UI.showNotification("¡Registro exitoso! Verifica tu email para continuar.")
+        window.UI.showNotification("¡Registro exitoso! Verifica tu email para continuar.")
         return { success: true, data }
       } else {
         // Fallback for demo
@@ -94,9 +99,9 @@ const Auth = {
 
         this.currentUser = newUser
         this.saveUserToStorage()
-        UI.updateAuthUI(this.currentUser)
+        window.UI.updateAuthUI(this.currentUser)
 
-        UI.showNotification("¡Registro exitoso!")
+        window.UI.showNotification("¡Registro exitoso!")
         return { success: true, data: newUser }
       }
     } catch (error) {
@@ -116,7 +121,7 @@ const Auth = {
 
         if (error) throw error
 
-        UI.showNotification("¡Bienvenido de vuelta!")
+        window.UI.showNotification("¡Bienvenido de vuelta!")
         return { success: true, data }
       } else {
         // Fallback for demo
@@ -129,9 +134,9 @@ const Auth = {
 
         this.currentUser = user
         this.saveUserToStorage()
-        UI.updateAuthUI(this.currentUser)
+        window.UI.updateAuthUI(this.currentUser)
 
-        UI.showNotification("¡Bienvenido de vuelta!")
+        window.UI.showNotification("¡Bienvenido de vuelta!")
         return { success: true, data: user }
       }
     } catch (error) {
@@ -149,10 +154,10 @@ const Auth = {
       } else {
         this.currentUser = null
         this.removeUserFromStorage()
-        UI.updateAuthUI(null)
+        window.UI.updateAuthUI(null)
       }
 
-      UI.showNotification("Sesión cerrada correctamente")
+      window.UI.showNotification("Sesión cerrada correctamente")
       return { success: true }
     } catch (error) {
       Utils.handleError(error, "logout")
@@ -170,11 +175,11 @@ const Auth = {
 
         if (error) throw error
 
-        UI.showNotification("Email de recuperación enviado. Revisa tu bandeja de entrada.")
+        window.UI.showNotification("Email de recuperación enviado. Revisa tu bandeja de entrada.")
         return { success: true }
       } else {
         // Simulate email sending for demo
-        UI.showNotification("Email de recuperación enviado (simulado).")
+        window.UI.showNotification("Email de recuperación enviado (simulado).")
         return { success: true }
       }
     } catch (error) {
@@ -194,7 +199,7 @@ const Auth = {
     const user = Utils.getStorage("inviteu_current_user")
     if (user) {
       this.currentUser = user
-      UI.updateAuthUI(this.currentUser)
+      window.UI.updateAuthUI(this.currentUser)
     }
   },
 
@@ -204,72 +209,10 @@ const Auth = {
 
   // Setup event listeners
   setupEventListeners() {
-    // Login form
-    const loginForm = Utils.$("#loginForm")
-    if (loginForm) {
-      const validationRules = {
-        email: [{ type: "required" }, { type: "email" }],
-        password: [{ type: "required" }],
-      }
-
-      Validation.setupValidation(loginForm, validationRules)
-
-      loginForm.addEventListener("submit", async (e) => {
-        e.preventDefault()
-
-        if (!Validation.validateForm(loginForm, validationRules)) return
-
-        const submitBtn = loginForm.querySelector('button[type="submit"]')
-        Utils.setLoading(submitBtn, true)
-
-        const formData = new FormData(loginForm)
-        const result = await this.login(formData.get("email"), formData.get("password"))
-
-        Utils.setLoading(submitBtn, false)
-
-        if (result.success) {
-          UI.closeModal("loginModal")
-          loginForm.reset()
-        }
-      })
-    }
-
-    // Register form
-    const registerForm = Utils.$("#registerForm")
-    if (registerForm) {
-      const validationRules = {
-        name: [{ type: "required" }],
-        email: [{ type: "required" }, { type: "email" }],
-        phone: [{ type: "phone" }],
-        password: [{ type: "required" }, { type: "minLength", value: CONFIG.VALIDATION.PASSWORD_MIN_LENGTH }],
-        confirmPassword: [{ type: "required" }, { type: "match", field: "#registerPassword" }],
-      }
-
-      Validation.setupValidation(registerForm, validationRules)
-
-      registerForm.addEventListener("submit", async (e) => {
-        e.preventDefault()
-
-        if (!Validation.validateForm(registerForm, validationRules)) return
-
-        const submitBtn = registerForm.querySelector('button[type="submit"]')
-        Utils.setLoading(submitBtn, true)
-
-        const formData = new FormData(registerForm)
-        const result = await this.register({
-          name: formData.get("name"),
-          email: formData.get("email"),
-          phone: formData.get("phone"),
-          password: formData.get("password"),
-        })
-
-        Utils.setLoading(submitBtn, false)
-
-        if (result.success) {
-          UI.closeModal("registerModal")
-          registerForm.reset()
-        }
-      })
+    // Wait for UI to be ready
+    if (!window.UI) {
+      setTimeout(() => this.setupEventListeners(), 100)
+      return
     }
 
     // Auth buttons
@@ -278,16 +221,105 @@ const Auth = {
     const logoutBtn = Utils.$("#logoutBtn")
 
     if (loginBtn) {
-      loginBtn.addEventListener("click", () => UI.openModal("loginModal"))
+      loginBtn.addEventListener("click", () => window.UI.openModal("loginModal"))
     }
 
     if (registerBtn) {
-      registerBtn.addEventListener("click", () => UI.openModal("registerModal"))
+      registerBtn.addEventListener("click", () => window.UI.openModal("registerModal"))
     }
 
     if (logoutBtn) {
       logoutBtn.addEventListener("click", () => this.logout())
     }
+
+    // Setup form listeners when modals are opened
+    document.addEventListener("modalOpened", (e) => {
+      if (e.detail.modalId === "loginModal") {
+        this.setupLoginForm()
+      } else if (e.detail.modalId === "registerModal") {
+        this.setupRegisterForm()
+      }
+    })
+  },
+
+  // Setup login form
+  setupLoginForm() {
+    const loginForm = Utils.$("#loginForm")
+    if (!loginForm) return
+
+    const validationRules = {
+      email: [{ type: "required" }, { type: "email" }],
+      password: [{ type: "required" }],
+    }
+
+    Validation.setupValidation(loginForm, validationRules)
+
+    // Remove existing listeners
+    const newForm = loginForm.cloneNode(true)
+    loginForm.parentNode.replaceChild(newForm, loginForm)
+
+    newForm.addEventListener("submit", async (e) => {
+      e.preventDefault()
+
+      if (!Validation.validateForm(newForm, validationRules)) return
+
+      const submitBtn = newForm.querySelector('button[type="submit"]')
+      Utils.setLoading(submitBtn, true)
+
+      const formData = new FormData(newForm)
+      const result = await this.login(formData.get("email"), formData.get("password"))
+
+      Utils.setLoading(submitBtn, false)
+
+      if (result.success) {
+        window.UI.closeModal("loginModal")
+        newForm.reset()
+      }
+    })
+  },
+
+  // Setup register form
+  setupRegisterForm() {
+    const registerForm = Utils.$("#registerForm")
+    if (!registerForm) return
+
+    const validationRules = {
+      name: [{ type: "required" }],
+      email: [{ type: "required" }, { type: "email" }],
+      phone: [{ type: "phone" }],
+      password: [{ type: "required" }, { type: "minLength", value: CONFIG.VALIDATION.PASSWORD_MIN_LENGTH }],
+      confirmPassword: [{ type: "required" }, { type: "match", field: "#registerPassword" }],
+    }
+
+    Validation.setupValidation(registerForm, validationRules)
+
+    // Remove existing listeners
+    const newForm = registerForm.cloneNode(true)
+    registerForm.parentNode.replaceChild(newForm, registerForm)
+
+    newForm.addEventListener("submit", async (e) => {
+      e.preventDefault()
+
+      if (!Validation.validateForm(newForm, validationRules)) return
+
+      const submitBtn = newForm.querySelector('button[type="submit"]')
+      Utils.setLoading(submitBtn, true)
+
+      const formData = new FormData(newForm)
+      const result = await this.register({
+        name: formData.get("name"),
+        email: formData.get("email"),
+        phone: formData.get("phone"),
+        password: formData.get("password"),
+      })
+
+      Utils.setLoading(submitBtn, false)
+
+      if (result.success) {
+        window.UI.closeModal("registerModal")
+        newForm.reset()
+      }
+    })
   },
 }
 

@@ -427,58 +427,177 @@ const UI = {
         this.closeModal(modalId)
       }
     })
+
+    // Setup modal switching
+    const switchToRegister = modal.querySelector("#switchToRegister")
+    const switchToLogin = modal.querySelector("#switchToLogin")
+
+    if (switchToRegister) {
+      switchToRegister.addEventListener("click", (e) => {
+        e.preventDefault()
+        this.closeModal("loginModal")
+        this.openModal("registerModal")
+      })
+    }
+
+    if (switchToLogin) {
+      switchToLogin.addEventListener("click", (e) => {
+        e.preventDefault()
+        this.closeModal("registerModal")
+        this.openModal("loginModal")
+      })
+    }
   },
 
   // Modal HTML templates
   getLoginModalHTML() {
     return `
-      <div id="loginModal" class="modal">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h2>Iniciar Sesión</h2>
-            <button class="close-modal">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="18" x2="6" y1="6" y2="18"/>
-                <line x1="6" x2="18" y1="6" y2="18"/>
-              </svg>
+    <div id="loginModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Iniciar Sesión</h2>
+          <button class="close-modal">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" x2="6" y1="6" y2="18"/>
+              <line x1="6" x2="18" y1="6" y2="18"/>
+            </svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="loginForm" class="auth-form">
+            <div class="form-group">
+              <label for="loginEmail">Email *</label>
+              <input type="email" id="loginEmail" name="email" required>
+              <div class="form-error"></div>
+            </div>
+            <div class="form-group">
+              <label for="loginPassword">Contraseña *</label>
+              <input type="password" id="loginPassword" name="password" required>
+              <div class="form-error"></div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-full">
+              <span class="btn-text">Iniciar Sesión</span>
+              <span class="loading-spinner" style="display: none;"></span>
             </button>
-          </div>
-          <div class="modal-body">
-            <form id="loginForm" class="auth-form">
-              <div class="form-group">
-                <label for="loginEmail">Email *</label>
-                <input type="email" id="loginEmail" name="email" required>
-                <div class="form-error"></div>
-              </div>
-              <div class="form-group">
-                <label for="loginPassword">Contraseña *</label>
-                <input type="password" id="loginPassword" name="password" required>
-                <div class="form-error"></div>
-              </div>
-              <button type="submit" class="btn btn-primary btn-full"></button>
-            </form>
+          </form>
+          <div class="auth-footer">
+            <p>¿No tienes cuenta? <a href="#" id="switchToRegister">Regístrate aquí</a></p>
           </div>
         </div>
       </div>
-    `
+    </div>
+  `
   },
 
-  showNotification(message) {
+  // Add getRegisterModalHTML method
+  getRegisterModalHTML() {
+    return `
+    <div id="registerModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Crear Cuenta</h2>
+          <button class="close-modal">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" x2="6" y1="6" y2="18"/>
+              <line x1="6" x2="18" y1="6" y2="18"/>
+            </svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="registerForm" class="auth-form">
+            <div class="form-group">
+              <label for="registerName">Nombre Completo *</label>
+              <input type="text" id="registerName" name="name" required>
+              <div class="form-error"></div>
+            </div>
+            <div class="form-group">
+              <label for="registerEmail">Email *</label>
+              <input type="email" id="registerEmail" name="email" required>
+              <div class="form-error"></div>
+            </div>
+            <div class="form-group">
+              <label for="registerPhone">Teléfono</label>
+              <input type="tel" id="registerPhone" name="phone">
+              <div class="form-error"></div>
+            </div>
+            <div class="form-group">
+              <label for="registerPassword">Contraseña *</label>
+              <input type="password" id="registerPassword" name="password" required minlength="6">
+              <div class="form-error"></div>
+            </div>
+            <div class="form-group">
+              <label for="confirmPassword">Confirmar Contraseña *</label>
+              <input type="password" id="confirmPassword" name="confirmPassword" required minlength="6">
+              <div class="form-error"></div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-full">
+              <span class="btn-text">Crear Cuenta</span>
+              <span class="loading-spinner" style="display: none;"></span>
+            </button>
+          </form>
+          <div class="auth-footer">
+            <p>¿Ya tienes cuenta? <a href="#" id="switchToLogin">Inicia sesión aquí</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  `
+  },
+
+  showNotification(message, type = "success") {
+    // Remove existing notifications
+    const existingNotification = document.querySelector(".notification")
+    if (existingNotification) {
+      existingNotification.remove()
+    }
+
+    // Create notification element
     const notification = document.createElement("div")
-    notification.classList.add("notification")
+    notification.className = `notification ${type}`
     notification.textContent = message
+
+    // Add styles
+    Object.assign(notification.style, {
+      position: "fixed",
+      top: "20px",
+      right: "20px",
+      background:
+        type === "success"
+          ? "linear-gradient(to right, #d4af37, #1e3a8a)"
+          : type === "error"
+            ? "#ef4444"
+            : type === "warning"
+              ? "#f59e0b"
+              : "#3b82f6",
+      color: "white",
+      padding: "12px 20px",
+      borderRadius: "8px",
+      boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+      zIndex: "1001",
+      fontSize: "14px",
+      fontWeight: "500",
+      transform: "translateX(100%)",
+      transition: "transform 0.3s ease",
+      maxWidth: "300px",
+      wordWrap: "break-word",
+    })
+
     document.body.appendChild(notification)
 
+    // Animate in
     setTimeout(() => {
-      notification.classList.add("show")
+      notification.style.transform = "translateX(0)"
     }, 100)
 
+    // Remove after 4 seconds
     setTimeout(() => {
-      notification.classList.remove("show")
+      notification.style.transform = "translateX(100%)"
       setTimeout(() => {
-        document.body.removeChild(notification)
+        if (notification.parentNode) {
+          notification.remove()
+        }
       }, 300)
-    }, 3000)
+    }, 4000)
   },
 
   openCustomizationModal(eventId) {
@@ -491,11 +610,28 @@ const UI = {
     this.showNotification(`Selected package type: ${packageType}`)
   },
 
+  updateAuthUI(user) {
+    const authButtons = Utils.$("#authButtons")
+    const userMenu = Utils.$("#userMenu")
+    const userName = Utils.$("#userName")
+
+    if (user) {
+      // User is logged in
+      if (authButtons) authButtons.style.display = "none"
+      if (userMenu) userMenu.style.display = "flex"
+      if (userName) userName.textContent = user.name || user.email
+    } else {
+      // User is logged out
+      if (authButtons) authButtons.style.display = "flex"
+      if (userMenu) userMenu.style.display = "none"
+    }
+  },
+
   updateCurrentYear() {
-    const yearElements = document.querySelectorAll(".current-year")
-    yearElements.forEach((element) => {
-      element.textContent = new Date().getFullYear()
-    })
+    const currentYearSpan = Utils.$("#currentYear")
+    if (currentYearSpan) {
+      currentYearSpan.textContent = new Date().getFullYear()
+    }
   },
 }
 
